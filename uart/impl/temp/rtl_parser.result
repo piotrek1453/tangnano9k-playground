@@ -1,0 +1,10 @@
+[
+ {
+  "InstFile" : "/home/juchap/kodzenie/fpga/tang_nano_9k/tangnano9k-playground/uart/src/uart_tx.sv",
+  "InstLine" : 12,
+  "InstName" : "uart_tx",
+  "ModuleFile" : "/home/juchap/kodzenie/fpga/tang_nano_9k/tangnano9k-playground/uart/src/uart_tx.sv",
+  "ModuleLine" : 12,
+  "ModuleName" : "uart_tx"
+ }
+]
