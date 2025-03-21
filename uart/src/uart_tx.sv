@@ -28,88 +28,82 @@ module uart_tx #(
     //! Clock signal
     input wire clk,
     //! Data word input
-    input reg [7:0] dataIn,
+    input wire [7:0] dataIn,
     //! Current data bit output
     output reg dataOut,
     //! Done flag
-    output reg done
+    output reg busy
 );
   //! Prescaler counter
-  reg [$bits(PRESCALER_COUNT):0] prescaler = 0;
+  reg [$bits(PRESCALER_COUNT)-1:0] prescaler = 0;
   //! Payload data bit counter
-  reg [2:0] numBits = 0;
+  reg [3:0] numBits = 0;
   //! Data word register
   reg [7:0] dataReg;
 
   uart_tx_state_t state;
 
-  always @(posedge clk) begin
+  always @(posedge clk) begin : uart_tx_fsm
     case (state)
       IDLE: begin
-        dataOut <= 1'b1;
-        done <= 1'b1;
-        if (dataIn != 8'h00) begin
+        dataOut <= 1'b1;  //! Idle state is high
+        busy <= 1'b0;  //! Clear busy flag
+        if (dataIn != 8'h00) begin  //! If there's a word to be sent...
+          dataReg <= dataIn;  //! Load the data word
+          busy <= 1'b1;  //! Set busy flag
           state <= START_BIT;
-          done  <= 0;
         end
       end
 
       START_BIT: begin
-        dataOut <= 1'b0;
-        prescaler <= 0;
-        dataReg <= dataIn;
-        numBits <= 0;
+        dataOut <= 1'b0;  //! Set start bit
+        prescaler <= 0;  //! Reset prescaler
+        numBits <= 0;  //! Reset bit counter
         state <= DATA;
       end
 
       DATA: begin
-        prescaler <= prescaler + 1;
-        if (prescaler == PRESCALER_COUNT && numBits < 8) begin
-          dataOut   <= dataReg[0];
-          dataReg   <= {dataReg[6:0], 1'b0};
-          numBits   <= numBits + 1;
-          prescaler <= 0;
+        if (prescaler == PRESCALER_COUNT) begin  //! delay for 1 bit time
+          if (numBits < 8) begin  //! If there are still bits to send...
+            dataOut   <= dataReg[0];  //! Send the LSB
+            dataReg   <= {1'b0, dataReg[7:1]};  // Shift right
+            numBits   <= numBits + 1;  //! Increment bit counter
+            prescaler <= 0;  //! Reset prescaler
+          end else begin  //! If all bits have been sent...
+            prescaler <= 0;  //! Reset prescaler
+            state <= PARITY_BIT;
+          end
         end else begin
-          prescaler <= 0;
-          state <= PARITY_BIT;
+          prescaler <= prescaler + 1;
         end
       end
 
       PARITY_BIT: begin
-        prescaler <= prescaler + 1;
-        case (PARITY)
-          'b01: begin
-            dataOut <= ~^dataReg;
-          end
-          'b10: begin
-            dataOut <= ~^dataReg;
-          end
-          default: state <= STOP_BIT;
-        endcase
-        if (prescaler == PRESCALER_COUNT) begin
-          state <= STOP_BIT;
+        if (prescaler == PRESCALER_COUNT) begin  //! delay for 1 bit time
+          case (PARITY) //! Match parity setting and either transmit the parity bit or skip it
+            'b01: dataOut <= ^dataIn;  //! Odd parity
+            'b10: dataOut <= ~^dataIn;  //! Even parity
+            default: dataOut <= 1'b1;  //! No parity
+          endcase
           prescaler <= 0;
+          state <= STOP_BIT;
+        end else begin
+          prescaler <= prescaler + 1;
         end
       end
 
       STOP_BIT: begin
-        prescaler <= prescaler + 1;
-        case (STOP_BITS)
-          'b1: begin
-            if (prescaler == 2 * PRESCALER_COUNT) begin
-              dataOut <= 1'b1;
-            end
-          end
-          default: begin
-            if (prescaler == PRESCALER_COUNT) begin
-              dataOut <= 1'b1;
-            end
-          end
-        endcase
-        state <= IDLE;
+        //! delay for 1 or 2 bit periods
+        if (prescaler == PRESCALER_COUNT * ({31'b0, STOP_BITS} + 1)) begin
+          dataOut <= 1'b1;  //! Set stop bit
+          state <= IDLE;  //! Return to idle state
+          prescaler <= 0;  //! Reset prescaler
+        end else begin
+          prescaler <= prescaler + 1;
+        end
       end
 
-      default: state <= IDLE;
+      default: state <= IDLE;  //! Default to idle state
     endcase
   end
 endmodule

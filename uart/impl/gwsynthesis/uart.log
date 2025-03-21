@@ -1,10 +1,13 @@
 GowinSynthesis start
 Running parser ...
 Analyzing Verilog file '/home/juchap/kodzenie/fpga/tang_nano_9k/tangnano9k-playground/uart/src/uart_tx.sv'
+Analyzing Verilog file '/home/juchap/kodzenie/fpga/tang_nano_9k/tangnano9k-playground/uart/src/top.sv'
+Compiling module 'top'("/home/juchap/kodzenie/fpga/tang_nano_9k/tangnano9k-playground/uart/src/top.sv":3)
+WARN  (EX3791) : Expression size 9 truncated to fit in target size 8("/home/juchap/kodzenie/fpga/tang_nano_9k/tangnano9k-playground/uart/src/top.sv":17)
 Compiling module 'uart_tx'("/home/juchap/kodzenie/fpga/tang_nano_9k/tangnano9k-playground/uart/src/uart_tx.sv":12)
-WARN  (EX3791) : Expression size 4 truncated to fit in target size 3("/home/juchap/kodzenie/fpga/tang_nano_9k/tangnano9k-playground/uart/src/uart_tx.sv":58)
-WARN  (EX3834) : Case condition never applies("/home/juchap/kodzenie/fpga/tang_nano_9k/tangnano9k-playground/uart/src/uart_tx.sv":72)
-NOTE  (EX0101) : Current top module is "uart_tx"
+WARN  (EX3791) : Expression size 5 truncated to fit in target size 4("/home/juchap/kodzenie/fpga/tang_nano_9k/tangnano9k-playground/uart/src/uart_tx.sv":70)
+WARN  (EX3834) : Case condition never applies("/home/juchap/kodzenie/fpga/tang_nano_9k/tangnano9k-playground/uart/src/uart_tx.sv":85)
+NOTE  (EX0101) : Current top module is "top"
 [5%] Running netlist conversion ...
 Running device independent optimization ...
 [10%] Optimizing Phase 0 completed

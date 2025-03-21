@@ -4,6 +4,10 @@
   {
    "Path" : "/home/juchap/kodzenie/fpga/tang_nano_9k/tangnano9k-playground/uart/src/uart_tx.sv",
    "Type" : "verilog"
+  },
+  {
+   "Path" : "/home/juchap/kodzenie/fpga/tang_nano_9k/tangnano9k-playground/uart/src/top.sv",
+   "Type" : "verilog"
   }
  ],
  "IncludePath" : [
