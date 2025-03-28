@@ -1,109 +1,90 @@
 `default_nettype none
 
-typedef enum logic [2:0] {
+typedef enum logic [1:0] {
   IDLE,
   START_BIT,
   DATA,
-  PARITY_BIT,
   STOP_BIT
 } uart_tx_state_t;
 
-
 module uart_tx #(
-    //! assuming 27MHz clock:
-    //!
-    //! baud rate set to 115200
-    parameter integer PRESCALER_COUNT = 234,
-    //! 'b00: no parity,
-    //!
-    //! 'b01: odd parity,
-    //!
-    //! 'b10: even parity
-    parameter logic [1:0] PARITY = 2'b00,
-    //! 'b0: 1 stop bit,
-    //!
-    //! 'b1: 2 stop bits
-    parameter logic STOP_BITS = 1'b0
+    parameter integer PRESCALER_COUNT = 234  //! Assuming 27MHz clock, baud rate 115200
 ) (
-    //! Clock signal
-    input wire clk,
-    //! Data word input
-    input wire [7:0] dataIn,
-    //! Current data bit output
-    output reg dataOut,
-    //! Done flag
-    output reg busy
+    input wire clk,                           //! Clock signal
+    input wire [7:0] dataIn,                  //! Data word input
+    input wire start,                         //! Transmission start strobe
+    output reg dataOut,                       //! Current data bit output
+    output reg busy                           //! Done flag
 );
-  //! Prescaler counter
-  reg [$bits(PRESCALER_COUNT)-1:0] prescaler = 0;
-  //! Payload data bit counter
-  reg [3:0] numBits = 0;
-  //! Data word register
-  reg [7:0] dataReg;
+  reg [$clog2(PRESCALER_COUNT)-1:0] prescaler = 0;  //! Prescaler counter
+  reg [3:0] numBits = 0;                           //! Payload data bit counter
+  reg [7:0] dataReg;                               //! Data word register
+  uart_tx_state_t state;                           //! State register
 
-  uart_tx_state_t state;
+  initial begin
+    dataOut = 1'b1;  //! Set idle state for UART
+    busy = 1'b0;     //! Clear busy flag
+    state = IDLE;    //! Set initial state
+    prescaler = 0;   //! Reset prescaler
+    numBits = 0;     //! Reset bit counter
+    dataReg = 8'b0;  //! Clear data register
+  end
 
   always @(posedge clk) begin : uart_tx_fsm
     case (state)
       IDLE: begin
-        dataOut <= 1'b1;  //! Idle state is high
-        busy <= 1'b0;  //! Clear busy flag
-        if (dataIn != 8'h00) begin  //! If there's a word to be sent...
-          dataReg <= dataIn;  //! Load the data word
-          busy <= 1'b1;  //! Set busy flag
-          state <= START_BIT;
+        dataOut <= 1'b1;  //! Set idle state for UART
+        if (start) begin
+          state <= START_BIT;  //! Go to start bit state
+          dataReg <= dataIn;   //! Load data to be sent
+          busy <= 1'b1;        //! Set busy flag
+          prescaler <= 0;      //! Reset prescaler
+          numBits <= 0;        //! Reset bit counter
         end
       end
 
       START_BIT: begin
-        dataOut <= 1'b0;  //! Set start bit
-        prescaler <= 0;  //! Reset prescaler
-        numBits <= 0;  //! Reset bit counter
-        state <= DATA;
+        if (prescaler >= PRESCALER_COUNT) begin
+          prescaler <= 0;  //! Reset prescaler
+          state <= DATA;   //! Go to data state
+          dataOut <= 1'b0; //! Set start bit
+        end else begin
+          prescaler <= prescaler + 1;
+        end
       end
 
       DATA: begin
-        if (prescaler == PRESCALER_COUNT) begin  //! delay for 1 bit time
-          if (numBits < 8) begin  //! If there are still bits to send...
-            dataOut   <= dataReg[0];  //! Send the LSB
-            dataReg   <= {1'b0, dataReg[7:1]};  // Shift right
-            numBits   <= numBits + 1;  //! Increment bit counter
+        if (prescaler >= PRESCALER_COUNT) begin
+          if (numBits < 8) begin
             prescaler <= 0;  //! Reset prescaler
-          end else begin  //! If all bits have been sent...
-            prescaler <= 0;  //! Reset prescaler
-            state <= PARITY_BIT;
+            dataOut <= dataReg[0];  //! Send the LSB
+            dataReg <= dataReg >> 1; //! Shift right
+            numBits <= numBits + 1; //! Increment bit counter
+          end else begin
+            state <= STOP_BIT;    //! Go to stop bit state
           end
         end else begin
           prescaler <= prescaler + 1;
         end
       end
 
-      PARITY_BIT: begin
-        if (prescaler == PRESCALER_COUNT) begin  //! delay for 1 bit time
-          case (PARITY) //! Match parity setting and either transmit the parity bit or skip it
-            'b01: dataOut <= ^dataIn;  //! Odd parity
-            'b10: dataOut <= ~^dataIn;  //! Even parity
-            default: dataOut <= 1'b1;  //! No parity
-          endcase
-          prescaler <= 0;
-          state <= STOP_BIT;
-        end else begin
-          prescaler <= prescaler + 1;
-        end
-      end
-
       STOP_BIT: begin
-        //! delay for 1 or 2 bit periods
-        if (prescaler == PRESCALER_COUNT * ({31'b0, STOP_BITS} + 1)) begin
+        dataOut <= 1'b1;  //! Set stop bit
+        if (prescaler >= PRESCALER_COUNT) begin
           dataOut <= 1'b1;  //! Set stop bit
-          state <= IDLE;  //! Return to idle state
           prescaler <= 0;  //! Reset prescaler
+          state <= IDLE;   //! Return to idle state
+          busy <= 1'b0;    //! Clear busy flag
         end else begin
           prescaler <= prescaler + 1;
         end
       end
 
-      default: state <= IDLE;  //! Default to idle state
+      default: begin
+        state <= IDLE;  //! Default to idle state
+        busy <= 1'b0;   //! Clear busy flag
+        dataOut <= 1'b1; //! Set idle output
+      end
     endcase
   end
 endmodule
