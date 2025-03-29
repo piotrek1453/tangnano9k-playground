@@ -1,7 +1,7 @@
 IO_LOC  "done" 16;
 IO_PORT "done" DRIVE=8 IO_TYPE=LVCMOS18 PULL_MODE=UP;
 
-IO_LOC  "dataOut" 38;
+IO_LOC  "dataOut" 17;
 IO_PORT "dataOut" DRIVE=8 IO_TYPE=LVCMOS33 PULL_MODE=UP;
 
 IO_LOC  "clk" 52;

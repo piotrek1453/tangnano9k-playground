@@ -1,0 +1,26 @@
+IO_LOC  "ledOut[0]" 10;
+IO_PORT "ledOut[0]" DRIVE=8 IO_TYPE=LVCMOS18;
+
+IO_LOC  "ledOut[1]" 11;
+IO_PORT "ledOut[1]" DRIVE=8 IO_TYPE=LVCMOS18;
+
+IO_LOC  "ledOut[2]" 13;
+IO_PORT "ledOut[2]" DRIVE=8 IO_TYPE=LVCMOS18;
+
+IO_LOC  "ledOut[3]" 14;
+IO_PORT "ledOut[3]" DRIVE=8 IO_TYPE=LVCMOS18;
+
+IO_LOC  "ledOut[4]" 15;
+IO_PORT "ledOut[4]" DRIVE=8 IO_TYPE=LVCMOS18;
+
+IO_LOC  "ledOut[5]" 16;
+IO_PORT "ledOut[5]" DRIVE=8 IO_TYPE=LVCMOS18;
+
+IO_LOC  "writeEnableIn" 3;
+IO_PORT "writeEnableIn" IO_TYPE=LVCMOS18;
+
+IO_LOC  "sysResetIn" 4;
+IO_PORT "sysResetIn" IO_TYPE=LVCMOS18;
+
+IO_LOC  "clkIn" 52;
+IO_PORT "clkIn" IO_TYPE=LVCMOS33 PULL_MODE=UP;
