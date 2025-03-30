@@ -6,20 +6,33 @@ module top(
   input wire sysResetIn,
   output reg [5:0] ledOut
 );
+
+  reg clkSlow = 0;
+  reg [5:0] dataReg = 6'b101010;
+  reg [5:0] ledReg;
+
+  always @(posedge writeEnableIn) begin
+    dataReg <= ~dataReg;
+  end
+
+  always @(posedge clkIn) begin
+    ledOut <= ledReg;
+  end
+
   fifo #(
-    .FIFO_WIDTH(2),
-    .FIFO_DEPTH(6)
+    .DATA_WIDTH(6),
+    .FIFO_DEPTH(1)
   ) fifo_led (
     .clkIn(clkIn),
     .writeEnableIn(writeEnableIn),
-    .dataIn(6'b000001),
-    .readEnableIn(1'b0),
+    .dataIn(dataReg),
+    .readEnableIn(sysResetIn),
     .loadEnableIn(1'b0),
-    .load({6'b101010, 6'b010101}),
-    .resetIn(sysResetIn),
-    .dataOut(ledOut),
-    .full(),
-    .empty(),
-    .tail()
+    // .load(dataReg),
+    // .resetIn(sysResetIn),
+    .serialDataOut(ledReg),
+    // .fullOut(),
+    // .emptyOut(),
+    .tailPointerOut()
   );
 endmodule
