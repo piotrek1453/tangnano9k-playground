@@ -19,7 +19,7 @@ module fifo
   input wire [DATA_WIDTH-1:0] dataIn, //! Sequential data word input
   input wire readEnableIn, //! Read from FIFO enable signal
   input wire loadEnableIn, //! Load FIFO enable signal
-  input wire [DATA_WIDTH-1:0][FIFO_DEPTH-1:0] load, //! Load data parallel input
+  input wire [DATA_WIDTH-1:0] load [0:FIFO_DEPTH-1], //! Load data parallel input
   input wire resetIn, //! Reset signal
 
   output reg [DATA_WIDTH-1:0] serialDataOut, //! Serial data word output
@@ -31,40 +31,44 @@ module fifo
 );
 
   reg [$clog2(FIFO_DEPTH) - 1:0] tailPointerReg;
-  reg [DATA_WIDTH - 1:0][FIFO_DEPTH-1:0] dataReg;
+  reg [DATA_WIDTH - 1:0] dataReg [0:FIFO_DEPTH-1];
   fifo_state_t state;
+
+  assign emptyOut = (tailPointerReg == 0) ? 1'b1 : 1'b0;
+  assign fullOut = (tailPointerReg == FIFO_DEPTH) ? 1'b1 : 1'b0;
+
+  integer i, j;
 
   always @(*) begin
     serialDataOut = dataReg[0];
   end
 
-  //! Initialize module for EMPTY state: sets all internal registers and outputs to their default values
+  //! Initialize module for EMPTY state: sets all internal registers and
+  //! outputs to their default values
   initial begin : fifo_init
-    fullOut = 'b0;
-    emptyOut = 'b1;
     tailPointerOut = 'b0;
 
     tailPointerReg = 'd0;
-    dataReg = 'b0;
+    for (i = 0; i < FIFO_DEPTH; i = i + 1) begin
+      dataReg[i] = 'b0;
+    end
     state = EMPTY;
   end
 
   always @(posedge clkIn) begin : fifo_fsm
 
     if (resetIn) begin
-      fullOut <= 'b0;
-      emptyOut <= 'b1;
       tailPointerOut <= 'b0;
 
       tailPointerReg <= 'd0;
-      dataReg = 'b0;
+      for (i = 0; i < FIFO_DEPTH; i = i + 1) begin
+        dataReg[i] <= 'b0;
+      end
       state <= EMPTY;
     end
 
     case (state)
       EMPTY: begin
-        fullOut <= 'b0;
-        emptyOut <= 'b1;
         tailPointerOut <= tailPointerReg;
         writeReadyOut <= 'b1;
         readReadyOut <= 'b0;
@@ -82,8 +86,6 @@ module fifo
         readReadyOut <= 'b0;
         dataReg[tailPointerReg] <= dataIn;
         tailPointerReg <= tailPointerReg + 1;
-        fullOut <= 'b0;
-        emptyOut <= 'b0;
         if (!writeEnableIn) begin
           state <= MEMORIZE;
         end
@@ -99,18 +101,17 @@ module fifo
         else begin
           writeReadyOut <= 'b1;
           readReadyOut <= 'b1;
-          fullOut <= 'b0;
-          emptyOut <= 'b0;
         end
       end
 
       SEQUENTIAL_OUTPUT: begin
         writeReadyOut <= 'b0;
         readReadyOut <= 'b1;
-        dataReg <= dataReg >> 1;
+        for (j = 0; j < FIFO_DEPTH - 1; j = j + 1) begin
+          dataReg[j] <= dataReg[j + 1];
+        end
+        dataReg[FIFO_DEPTH - 1] <= 'b0; // Ostatni element wyzerowany
         tailPointerReg <= tailPointerReg - 1;
-        fullOut <= 'b0;
-        emptyOut <= 'b0;
         if (tailPointerReg == 0) begin
           state <= EMPTY;
         end
@@ -122,7 +123,9 @@ module fifo
       LOAD: begin
         writeReadyOut <= 'b0;
         readReadyOut <= 'b0;
-        dataReg <= load;
+        for (i = 0; i < FIFO_DEPTH; i = i + 1) begin
+            dataReg[i] <= load[i];
+        end
         tailPointerReg <= FIFO_DEPTH - 1;
         state <= FULL;
       end
@@ -130,8 +133,6 @@ module fifo
       FULL: begin
         writeReadyOut <= 'b0;
         readReadyOut <= 'b1;
-        emptyOut <= 'b0;
-        fullOut <= 'b1;
         tailPointerReg <= DATA_WIDTH - 1;
         if (readEnableIn) begin
           state <= SEQUENTIAL_OUTPUT;

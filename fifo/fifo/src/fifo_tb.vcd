@@ -1,0 +1,189 @@
+$date
+	Wed Apr  2 22:18:43 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module fifo_tb $end
+$var wire 1 ! writeReadyOut $end
+$var wire 4 " tailPointerOut [3:0] $end
+$var wire 8 # serialDataOut [7:0] $end
+$var wire 1 $ readReadyOut $end
+$var wire 1 % fullOut $end
+$var wire 1 & emptyOut $end
+$var parameter 32 ' DATA_WIDTH $end
+$var parameter 32 ( FIFO_DEPTH $end
+$var reg 1 ) clkIn $end
+$var reg 8 * dataIn [7:0] $end
+$var reg 1 + loadEnableIn $end
+$var reg 1 , readEnableIn $end
+$var reg 1 - resetIn $end
+$var reg 1 . writeEnableIn $end
+$scope module uut $end
+$var wire 1 ) clkIn $end
+$var wire 8 / dataIn [7:0] $end
+$var wire 1 + loadEnableIn $end
+$var wire 1 , readEnableIn $end
+$var wire 1 - resetIn $end
+$var wire 1 . writeEnableIn $end
+$var wire 1 % fullOut $end
+$var wire 1 & emptyOut $end
+$var parameter 32 0 DATA_WIDTH $end
+$var parameter 32 1 FIFO_DEPTH $end
+$var reg 1 $ readReadyOut $end
+$var reg 8 2 serialDataOut [7:0] $end
+$var reg 3 3 state [2:0] $end
+$var reg 4 4 tailPointerOut [3:0] $end
+$var reg 4 5 tailPointerReg [3:0] $end
+$var reg 1 ! writeReadyOut $end
+$var integer 32 6 i [31:0] $end
+$var integer 32 7 j [31:0] $end
+$scope begin fifo_fsm $end
+$upscope $end
+$scope begin fifo_init $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b10000 1
+b1000 0
+b10000 (
+b1000 '
+$end
+#0
+$dumpvars
+bx 7
+b10000 6
+b0 5
+b0 4
+b0 3
+b0 2
+b0 /
+0.
+1-
+0,
+0+
+b0 *
+0)
+1&
+0%
+x$
+b0 #
+b0 "
+x!
+$end
+#5000
+0$
+1!
+b10000 6
+1)
+#10000
+0)
+0-
+#15000
+1)
+#20000
+0)
+1-
+#25000
+b10000 6
+1)
+#30000
+0)
+b10100101 *
+b10100101 /
+1.
+0-
+#35000
+b1 3
+1)
+#40000
+0)
+b1011010 *
+b1011010 /
+#45000
+0&
+b1011010 #
+b1011010 2
+b1 5
+0!
+1)
+#50000
+0)
+1,
+0.
+#55000
+b10 3
+b10 5
+1)
+#60000
+0)
+1+
+0,
+#65000
+1$
+1!
+1)
+#70000
+0)
+1,
+0+
+#75000
+b11 3
+1)
+#80000
+0)
+#85000
+b1 5
+0!
+b1111 7
+1)
+#90000
+0)
+#95000
+1&
+b0 #
+b0 2
+b0 5
+b1111 7
+1)
+#100000
+0)
+#105000
+0&
+b0 3
+b1111 5
+b1111 7
+1)
+#110000
+0)
+0,
+#115000
+0$
+1!
+b1111 "
+b1111 4
+1)
+#120000
+0)
+#125000
+1)
+#130000
+0)
+#135000
+1)
+#140000
+0)
+#145000
+1)
+#150000
+0)
+#155000
+1)
+#160000
+0)
