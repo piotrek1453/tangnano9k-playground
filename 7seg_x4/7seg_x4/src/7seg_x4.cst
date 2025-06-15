@@ -1,0 +1,37 @@
+//Copyright (C)2014-2024 Gowin Semiconductor Corporation.
+//All rights reserved. 
+//File Title: Physical Constraints file
+//Tool Version: V1.9.11
+//Part Number: GW1NR-LV9QN88PC6/I5
+//Device: GW1NR-9
+//Device Version: C
+//Created Time: Sun 06 15 20:10:56 2025
+
+IO_LOC "segmentEnable[7]" 25;
+IO_PORT "segmentEnable[7]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
+IO_LOC "segmentEnable[6]" 26;
+IO_PORT "segmentEnable[6]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
+IO_LOC "segmentEnable[5]" 27;
+IO_PORT "segmentEnable[5]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
+IO_LOC "segmentEnable[4]" 28;
+IO_PORT "segmentEnable[4]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
+IO_LOC "segmentEnable[3]" 29;
+IO_PORT "segmentEnable[3]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
+IO_LOC "segmentEnable[2]" 30;
+IO_PORT "segmentEnable[2]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
+IO_LOC "segmentEnable[1]" 33;
+IO_PORT "segmentEnable[1]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
+IO_LOC "segmentEnable[0]" 34;
+IO_PORT "segmentEnable[0]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
+IO_LOC "digitEnable[3]" 38;
+IO_PORT "digitEnable[3]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
+IO_LOC "digitEnable[2]" 37;
+IO_PORT "digitEnable[2]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
+IO_LOC "digitEnable[1]" 36;
+IO_PORT "digitEnable[1]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
+IO_LOC "digitEnable[0]" 39;
+IO_PORT "digitEnable[0]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
+IO_LOC "resetIn" 4;
+IO_PORT "resetIn" IO_TYPE=LVCMOS18 PULL_MODE=NONE BANK_VCCIO=1.8;
+IO_LOC "clkIn" 52;
+IO_PORT "clkIn" IO_TYPE=LVCMOS33 PULL_MODE=UP BANK_VCCIO=3.3;
