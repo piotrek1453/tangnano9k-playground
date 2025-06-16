@@ -3,35 +3,39 @@
 module display (
     input wire clkIn,
     input wire resetIn,
-    input wire increment,
-    output reg [7:0] segmentEnable,
-    output reg overflow
+    input wire incrementIn,
+    input wire dotClkIn,
+    output reg [7:0] segmentEnableOut,
+    output reg overflowOut
 );
 
   reg [3:0] count;
 
   counter digit (
-      .clkIn(increment),
+      .clkIn(incrementIn),
       .resetIn(resetIn),
       .countOut(count),
-      .overflow(overflow)
+      .overflowOut(overflowOut)
   );
 
+  always @(posedge dotClkIn) begin
+    segmentEnableOut[0] <= ~segmentEnableOut[0];
+  end
+
   always @(posedge clkIn) begin
-    segmentEnable[0] <= 1;  // dot
     // a, b, c, d, e, f, g
     case (count)
-      'd0: segmentEnable[7:1] <= ~7'b1111110;
-      'd1: segmentEnable[7:1] <= ~7'b0110000;
-      'd2: segmentEnable[7:1] <= ~7'b1101101;
-      'd3: segmentEnable[7:1] <= ~7'b1111001;
-      'd4: segmentEnable[7:1] <= ~7'b0110011;
-      'd5: segmentEnable[7:1] <= ~7'b1011011;
-      'd6: segmentEnable[7:1] <= ~7'b1011111;
-      'd7: segmentEnable[7:1] <= ~7'b1110000;
-      'd8: segmentEnable[7:1] <= ~7'b1111111;
-      'd9: segmentEnable[7:1] <= ~7'b1111011;
-      default: segmentEnable <= ~7'b1111110;
+      'd0: segmentEnableOut[7:1] <= ~7'b1111110;
+      'd1: segmentEnableOut[7:1] <= ~7'b0110000;
+      'd2: segmentEnableOut[7:1] <= ~7'b1101101;
+      'd3: segmentEnableOut[7:1] <= ~7'b1111001;
+      'd4: segmentEnableOut[7:1] <= ~7'b0110011;
+      'd5: segmentEnableOut[7:1] <= ~7'b1011011;
+      'd6: segmentEnableOut[7:1] <= ~7'b1011111;
+      'd7: segmentEnableOut[7:1] <= ~7'b1110000;
+      'd8: segmentEnableOut[7:1] <= ~7'b1111111;
+      'd9: segmentEnableOut[7:1] <= ~7'b1111011;
+      default: segmentEnableOut[7:1] <= ~7'b1111110;
     endcase
 
   end

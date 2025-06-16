@@ -5,10 +5,11 @@ module top #(
 ) (
     input wire clkIn,
     input wire resetIn,
-    output reg [3:0] digitEnable,
-    output reg [7:0] segmentEnable
+    output reg [3:0] digitEnableOut,
+    output reg [7:0] segmentEnableOut,
+    output reg ledOut
 );
-  localparam CLK_SWEEP = int'(CLK_FREQUENCY / 1000);  // 1kHz digit sweeping
+  localparam CLK_SWEEP = int'(CLK_FREQUENCY / 100000);  // digit refreshing
 
   reg [$clog2(CLK_FREQUENCY)-1:0] delay_1s = 0;
   reg [$clog2(CLK_SWEEP)-1:0] delay_sweep = 0;
@@ -16,9 +17,10 @@ module top #(
   reg [3:0] overflow;
 
   reg [7:0] displayReg[3:0];
+  reg [1:0] currentDigitIndex;
 
   initial begin
-    digitEnable = 'b1000;
+    digitEnableOut = 'b0001;
   end
 
   always @(posedge clkIn) begin
@@ -40,40 +42,45 @@ module top #(
   end
 
   always @(posedge tick_sweep) begin
-    digitEnable   <= {digitEnable[2:0], digitEnable[3]};
-    segmentEnable <= displayReg[one_hot_to_binary(digitEnable)];
+    ledOut <= ~ledOut;
+    digitEnableOut <= {digitEnableOut[2:0], digitEnableOut[3]};
+    segmentEnableOut <= displayReg[one_hot_to_binary(digitEnableOut)];
   end
 
   display display0 (
       .clkIn(clkIn),
-      .increment(tick_1s),
+      .dotClkIn(tick_1s),
+      .incrementIn(tick_1s),
       .resetIn(resetIn),
-      .overflow(overflow[0]),
-      .segmentEnable(displayReg[0])
+      .overflowOut(overflow[0]),
+      .segmentEnableOut(displayReg[0])
   );
 
   display display1 (
       .clkIn(clkIn),
+      .dotClkIn(overflow[0]),
       .resetIn(resetIn),
-      .increment(overflow[0]),
-      .overflow(overflow[1]),
-      .segmentEnable(displayReg[1])
+      .incrementIn(overflow[0]),
+      .overflowOut(overflow[1]),
+      .segmentEnableOut(displayReg[1])
   );
 
   display display2 (
       .clkIn(clkIn),
+      .dotClkIn(overflow[1]),
       .resetIn(resetIn),
-      .increment(overflow[1]),
-      .overflow(overflow[2]),
-      .segmentEnable(displayReg[2])
+      .incrementIn(overflow[1]),
+      .overflowOut(overflow[2]),
+      .segmentEnableOut(displayReg[2])
   );
 
   display display3 (
       .clkIn(clkIn),
+      .dotClkIn(overflow[2]),
       .resetIn(resetIn),
-      .increment(overflow[2]),
-      .overflow(overflow[3]),
-      .segmentEnable(displayReg[3])
+      .incrementIn(overflow[2]),
+      .overflowOut(overflow[3]),
+      .segmentEnableOut(displayReg[3])
   );
 
 endmodule
@@ -82,11 +89,11 @@ function automatic [1:0] one_hot_to_binary;
   input [3:0] one_hot;
   begin
     case (one_hot)
-      'b0001:  one_hot_to_binary = 'd0;
-      'b0010:  one_hot_to_binary = 'd1;
-      'b0100:  one_hot_to_binary = 'd2;
-      'b1000:  one_hot_to_binary = 'd3;
-      default: one_hot_to_binary = 'd0;
+      4'b1000: one_hot_to_binary = 2'd0;
+      4'b0001: one_hot_to_binary = 2'd1;
+      4'b0010: one_hot_to_binary = 2'd2;
+      4'b0100: one_hot_to_binary = 2'd3;
+      default: one_hot_to_binary = 2'd0;
     endcase
   end
 endfunction
