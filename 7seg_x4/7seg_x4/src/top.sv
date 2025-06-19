@@ -47,36 +47,40 @@ module top #(
     segmentEnableOut <= displayReg[one_hot_to_binary(digitEnableOut)];
   end
 
-  display display0 (
-      .clkIn(clkIn),
-      .dotClkIn(tick_1s),
+  display #(
+      .MAX_NUMBER(9)
+  ) display0 (
+      .dotIn(tick_1s),
       .incrementIn(tick_1s),
       .resetIn(resetIn),
       .overflowOut(overflow[0]),
       .segmentEnableOut(displayReg[0])
   );
 
-  display display1 (
-      .clkIn(clkIn),
-      .dotClkIn(overflow[0]),
+  display #(
+      .MAX_NUMBER(5)
+  ) display1 (
+      .dotIn(overflow[0]),
       .resetIn(resetIn),
       .incrementIn(overflow[0]),
       .overflowOut(overflow[1]),
       .segmentEnableOut(displayReg[1])
   );
 
-  display display2 (
-      .clkIn(clkIn),
-      .dotClkIn(overflow[1]),
+  display #(
+      .MAX_NUMBER(9)
+  ) display2 (
+      .dotIn(overflow[1]),
       .resetIn(resetIn),
       .incrementIn(overflow[1]),
       .overflowOut(overflow[2]),
       .segmentEnableOut(displayReg[2])
   );
 
-  display display3 (
-      .clkIn(clkIn),
-      .dotClkIn(overflow[2]),
+  display #(
+      .MAX_NUMBER(1)
+  ) display3 (
+      .dotIn(overflow[2]),
       .resetIn(resetIn),
       .incrementIn(overflow[2]),
       .overflowOut(overflow[3]),
